@@ -1,0 +1,7 @@
+/api/elsa-quiz/node_modules/
+/api/elsa-user/node_modules/
+/App/elsa-frontend/.angular/
+/App/elsa-frontend/node_modules/
+/App/elsa-frontend/.vscode/
+/api/elsa-user/yarn.lock
+/api/elsa-user/package-lock.json

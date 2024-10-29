@@ -1,0 +1,192 @@
+[
+  {
+    "question": "What is the past tense of 'go'?",
+    "answers": [
+      "went",
+      "gone",
+      "going",
+      "goes"
+    ],
+    "correctAnswer": "went"
+  },
+  {
+    "question": "Which word is a synonym for 'happy'?",
+    "answers": [
+      "sad",
+      "joyful",
+      "angry",
+      "neutral"
+    ],
+    "correctAnswer": "joyful"
+  },
+  {
+    "question": "What is the opposite of 'hot'?",
+    "answers": [
+      "warm",
+      "cold",
+      "boiling",
+      "tepid"
+    ],
+    "correctAnswer": "cold"
+  },
+  {
+    "question": "Which of the following is a noun?",
+    "answers": [
+      "quickly",
+      "happy",
+      "car",
+      "blue"
+    ],
+    "correctAnswer": "car"
+  },
+  {
+    "question": "What does 'bilingual' mean?",
+    "answers": [
+      "speaking one language",
+      "speaking two languages",
+      "speaking three languages",
+      "speaking four languages"
+    ],
+    "correctAnswer": "speaking two languages"
+  },
+  {
+    "question": "What is the plural of 'child'?",
+    "answers": [
+      "childs",
+      "children",
+      "childrens",
+      "childes"
+    ],
+    "correctAnswer": "children"
+  },
+  {
+    "question": "Which word is an adjective?",
+    "answers": [
+      "run",
+      "beautiful",
+      "quickly",
+      "happiness"
+    ],
+    "correctAnswer": "beautiful"
+  },
+  {
+    "question": "What is the meaning of 'metaphor'?",
+    "answers": [
+      "a direct comparison",
+      "a figure of speech",
+      "a type of poem",
+      "a literal statement"
+    ],
+    "correctAnswer": "a figure of speech"
+  },
+  {
+    "question": "Which sentence is correct?",
+    "answers": [
+      "He go to the store.",
+      "He gone to the store.",
+      "He goes to the store.",
+      "He going to the store."
+    ],
+    "correctAnswer": "He goes to the store."
+  },
+  {
+    "question": "What is a synonym for 'difficult'?",
+    "answers": [
+      "easy",
+      "hard",
+      "simple",
+      "clear"
+    ],
+    "correctAnswer": "hard"
+  },
+  {
+    "question": "Which word is an adverb?",
+    "answers": [
+      "slow",
+      "slowly",
+      "slowness",
+      "slowest"
+    ],
+    "correctAnswer": "slowly"
+  },
+  {
+    "question": "What does 'antonym' mean?",
+    "answers": [
+      "similar meaning",
+      "opposite meaning",
+      "same meaning",
+      "undefined meaning"
+    ],
+    "correctAnswer": "opposite meaning"
+  },
+  {
+    "question": "Which sentence is in passive voice?",
+    "answers": [
+      "The cat chased the mouse.",
+      "The mouse was chased by the cat.",
+      "The cat is chasing the mouse.",
+      "The cat chases the mouse."
+    ],
+    "correctAnswer": "The mouse was chased by the cat."
+  },
+  {
+    "question": "What is the main idea of a text?",
+    "answers": [
+      "The summary",
+      "The supporting details",
+      "The primary message",
+      "The conclusion"
+    ],
+    "correctAnswer": "The primary message"
+  },
+  {
+    "question": "Which of the following is a compound sentence?",
+    "answers": [
+      "I like coffee.",
+      "I like coffee and tea.",
+      "Although I like coffee, I prefer tea.",
+      "I like coffee; I drink it every day."
+    ],
+    "correctAnswer": "I like coffee; I drink it every day."
+  },
+  {
+    "question": "What does 'irony' refer to?",
+    "answers": [
+      "a serious statement",
+      "a sarcastic remark",
+      "an unexpected outcome",
+      "a metaphorical expression"
+    ],
+    "correctAnswer": "an unexpected outcome"
+  },
+  {
+    "question": "What is the correct form of the verb in this sentence: 'He _____ to school every day.'?",
+    "answers": [
+      "walk",
+      "walking",
+      "walks",
+      "walked"
+    ],
+    "correctAnswer": "walks"
+  },
+  {
+    "question": "Which punctuation mark is used to indicate a question?",
+    "answers": [
+      "Period",
+      "Exclamation mark",
+      "Comma",
+      "Question mark"
+    ],
+    "correctAnswer": "Question mark"
+  },
+  {
+    "question": "What is an example of a homophone?",
+    "answers": [
+      "bear - bare",
+      "there - their",
+      "site - sight",
+      "all of the above"
+    ],
+    "correctAnswer": "all of the above"
+  }
+]
