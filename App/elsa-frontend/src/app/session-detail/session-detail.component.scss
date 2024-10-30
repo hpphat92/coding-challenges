@@ -1,4 +1,10 @@
 :host {
+  display: flex;
+  gap: 12px;
+
+  .question-container {
+    width: 50%;
+  }
   .answer-container {
     display: flex;
     flex-direction: column;
@@ -22,6 +28,19 @@
         background-color: #76f441;
         font-weight: bold;
       }
+    }
+  }
+
+  .leader-board {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 120px;
+
+    .user-detail {
+      display: flex;
+      justify-content: space-between;
+      width: 120px;
     }
   }
 }

@@ -5,3 +5,7 @@
 /App/elsa-frontend/.vscode/
 /api/elsa-user/yarn.lock
 /api/elsa-user/package-lock.json
+/api/elsa-quiz/package-lock.json
+/api/elsa-quiz/yarn.lock
+/api/elsa-user/package-lock.json
+/api/elsa-user/yarn.lock

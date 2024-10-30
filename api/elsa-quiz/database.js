@@ -35,12 +35,17 @@ const playerQuizSessionSchema = new mongoose.Schema({
     timeForEachAnswer: {type: Number, default: 0},
     score: {type: Number, required: true, default: 0},
 });
+const playersSchema = new mongoose.Schema({
+    name: {type: String, required: true, unique: true},
+    displayName: {type: String, required: true},
+});
 //#endregion Define schema
 
 module.exports = {
     model: {
         Questions: mongoose.model('questions', questionSchema),
         QuizSession: mongoose.model('quiz_session', quizSessionSchema),
-        PlayerQuizSession: mongoose.model('player_quiz_session', playerQuizSessionSchema)
+        PlayerQuizSession: mongoose.model('player_quiz_session', playerQuizSessionSchema),
+        Players: mongoose.model('players', playersSchema)
     }
 };

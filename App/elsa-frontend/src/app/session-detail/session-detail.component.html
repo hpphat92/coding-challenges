@@ -1,16 +1,29 @@
 <ng-container *ngIf="!success">
-  <div class="question">
-    {{ question?.question }}
-  </div>
-  <div class="answer-container">
-    <div class="answer" *ngFor="let a of question?.answers" (click)="selectAnswer(a)"
-         [class.selected]="selectedAnswer === a">
-      {{ a }}
+  <div class="question-container">
+    <div class="question">
+      {{ question?.question }}
     </div>
-  </div>
+    <div class="answer-container">
+      <div class="answer" *ngFor="let a of question?.answers" (click)="selectAnswer(a)"
+           [class.selected]="selectedAnswer === a">
+        {{ a }}
+      </div>
+    </div>
 
-  <button *ngIf="selectedAnswer" (click)="submitAnswer()">Submit</button>
+    <button *ngIf="selectedAnswer" (click)="submitAnswer()">Submit</button>
+  </div>
 </ng-container>
 <ng-container *ngIf="success">
   Congratulation!, You have finished the game.
 </ng-container>
+
+<div class="leader-board">
+  Leaderboard
+
+  <ng-container *ngFor="let user of allUserBySession">
+    <div class="user-detail">
+      <div class="name">{{ user.userDetails.displayName }}</div>
+      <div class="score">{{ user.score }}</div>
+    </div>
+  </ng-container>
+</div>

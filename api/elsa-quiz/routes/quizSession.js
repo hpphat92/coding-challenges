@@ -3,6 +3,8 @@ var lodash = require('lodash');
 const db = require("../database");
 const {TIME_FOR_EACH_ANSWER_IN_SECONDS} = require("../config");
 var router = express.Router();
+const socketIO = require('../socket');
+const {ObjectId} = require('mongodb');
 
 // Get session detail
 router.get('/:sessionId', async (req, res) => {
@@ -35,6 +37,7 @@ router.post('/', async (req, res) => {
 
 // New Session
 router.post('/join', async (req, res) => {
+    const io = socketIO.getIO();
     try {
         const {
             sessionName, userId
@@ -64,6 +67,11 @@ router.post('/join', async (req, res) => {
             sessionId: session._id, userId, questionList: questionListId, timeForEachAnswer: session.timeForEachAnswer
         });
         const userSession = await userSessionDB.save();
+        const user = await db.model.Players.findById(userId);
+        io.emit('joinRoom', {
+            user,
+            userSession: userSession._id
+        });
         res.status(200).json(userSession._id);
     } catch (err) {
         res.status(500).json({message: 'Error creating user quiz session', error: err.message});
@@ -71,7 +79,7 @@ router.post('/join', async (req, res) => {
 });
 
 // Get current question
-router.post('/current-question', async (req, res) => {
+router.post('/current-questions', async (req, res) => {
     try {
         const {
             userSessionId, userId
@@ -79,7 +87,8 @@ router.post('/current-question', async (req, res) => {
 
         const existingUserSession = await db.model.PlayerQuizSession.findById(userSessionId);
 
-        if (!existingUserSession) {
+
+        if (!existingUserSession || existingUserSession.userId !== userId) {
             return res.status(400).json({message: 'Session not found'});
         }
 
@@ -97,19 +106,64 @@ router.post('/current-question', async (req, res) => {
 
         const currentQuestion = existingUserSession.questionList[existingUserSession.currentQuestionIdx];
 
-        if (!currentQuestion) {
-            return res.status(203).json({message: 'Game Successfully done'});
+        // if (!currentQuestion) {
+        //     return res.status(203).json({message: 'Game Successfully done'});
+        // }
+        let question;
+
+        if (currentQuestion) {
+            question = await db.model.Questions.findById(currentQuestion).select({
+                question: 1, answers: 1
+            });
+
+            if (!question) {
+                return res.status(400).json({message: 'Question not found'});
+            }
         }
 
-        const question = await db.model.Questions.findById(currentQuestion).select({
-            question: 1, answers: 1
+        const allUserBySession = await db.model.PlayerQuizSession.aggregate([
+            {
+                $match: {sessionId: existingUserSession.sessionId} // Equivalent to find() query
+            },
+            {
+                $lookup: {
+                    from: "players",            // Collection to join
+                    let: {userId: "$userId"}, // Pass the userId from PlayerQuizSession
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $eq: ["$_id", {$toObjectId: "$$userId"}] // Compare ObjectId with converted userId
+                                }
+                            }
+                        }
+                    ],
+                    as: "userDetails"           // Alias for the joined data
+                }
+            },
+            {
+                $unwind: {
+                    path: "$userDetails",      // Deconstructs the array to get a single user object
+                    preserveNullAndEmptyArrays: true // Optional: preserves documents if no match found
+                }
+            },
+            {
+                $project: {
+                    score: 1,
+                    "userDetails.name": 1,      // Include user name from joined data
+                    "userDetails._id": 1,      // Include user name from joined data
+                    "userDetails.displayName": 1 // Include display name from joined data
+                }
+            }
+        ]);
+
+        res.status(200).json({
+            question,
+            allUserBySession,
+            userDetail: {
+                score: existingUserSession.score,
+            }
         });
-
-        if (!question) {
-            return res.status(400).json({message: 'Question not found'});
-        }
-
-        res.status(200).json(question);
     } catch (err) {
         res.status(500).json({message: 'Error getting current question', error: err.message});
     }
@@ -117,6 +171,7 @@ router.post('/current-question', async (req, res) => {
 
 // Answer the question
 router.put('/answer-question', async (req, res) => {
+    const io = socketIO.getIO();
     try {
         const {
             userSessionId, userId, answer, questionId
@@ -158,6 +213,8 @@ router.put('/answer-question', async (req, res) => {
         userSession.currentQuestionIdx++;
         userSession.currentQuestionTimeRequested = 0;
         await userSession.save();
+
+        io.emit('userStateChanged', userSession);
 
         res.status(201).json();
     } catch (err) {

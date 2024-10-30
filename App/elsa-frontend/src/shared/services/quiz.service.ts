@@ -18,7 +18,7 @@ export class QuizService {
   }
 
   getCurrentQuestionOfQuiz(requestBody: any) {
-    return this.http.post(`${ environment.quizService }/quiz/current-question`, requestBody)
+    return this.http.post(`${ environment.quizService }/quiz/current-questions`, requestBody)
   }
 
   answerTheQuestion(requestBody: any) {
