@@ -20,9 +20,13 @@ export class RegisterComponent {
   }
 
   createNewUser() {
+    if (!this.newUserName) {
+      return;
+    }
+
     this.userServices.createNewUser(this.newUserName).subscribe(() => {
       this.toastr.success('User created successfully', 'Success');
-      this.router.navigate(['/login']);
+      this.router.navigate([ '/login' ]);
     }, (err) => {
       this.toastr.error(err?.error?.message, 'Error');
     })

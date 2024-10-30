@@ -1,4 +1,10 @@
-Create user
-<input [(ngModel)]="newUserName"/>
-<button (click)="createNewUser()">Create user</button>
+<p>Create user</p>
+<form>
+  <input [(ngModel)]="newUserName" [ngModelOptions]="{standalone: true}"/>
+  <button (click)="createNewUser()" [disabled]="!newUserName">Create user</button>
+
+  <div class="signup">
+    Already have account? <a href="/login">Login</a>
+  </div>
+</form>
 

@@ -1,0 +1,120 @@
+:host {
+  .welcome-container {
+    font-size: 20px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    width: 40vw;
+    justify-content: space-between;
+  }
+
+  .user-selection {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .join-existing-room {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    height: 120px;
+    border: 1px solid #cecece;
+    border-radius: 12px;
+    font-size: 24px;
+    color: #cccccc;
+    background: #070b76;
+    box-shadow: 0 2px 6px #070b76;
+    cursor: pointer;
+
+    :hover {
+      opacity: 0.7;
+    }
+  }
+
+  .room-creation-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+
+    input {
+      font-size: 24px;
+      padding: 8px;
+    }
+
+    button {
+      height: 40px;
+      font-size: 16px;
+      background-color: rgba(1, 9, 197);
+      color: #eee;
+
+      &:not(:disabled) {
+        cursor: pointer;
+      }
+
+      &:disabled {
+        color: #aaa;
+        background-color: #2e1313;
+      }
+    }
+
+    .action-button {
+      display: flex;
+      gap: 12px;
+
+      .outline-btn {
+        background-color: transparent;
+        color: #000;
+        border: none;
+      }
+    }
+  }
+
+  .my-session {
+    p {
+      font-size: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .session-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+
+      .session-name {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 48px;
+        border: 1px solid #ccc;
+        padding: 0 16px;
+        border-radius: 8px;
+
+        .name {
+          font-size: 14px;
+        }
+
+        button {
+          height: 40px;
+          font-size: 16px;
+          background-color: rgba(1, 9, 197);
+          color: #eee;
+          border-radius: 8px;
+
+          &:not(:disabled) {
+            cursor: pointer;
+          }
+
+          &:disabled {
+            color: #aaa;
+            background-color: #2e1313;
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,10 +1,11 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, ViewChild } from "@angular/core";
 import { Router } from "@angular/router";
 import { FormsModule } from "@angular/forms";
 import { QuizService } from "../../shared/services/quiz.service";
 import { ToastrService } from "ngx-toastr";
 import { CommonModule } from "@angular/common";
 import { WebsocketService } from "../../shared/services/websocket.service";
+import { CountdownComponent, CountdownModule } from "ngx-countdown";
 
 @Component({
   selector: 'app-session-detail',
@@ -12,16 +13,23 @@ import { WebsocketService } from "../../shared/services/websocket.service";
   templateUrl: './session-detail.component.html',
   imports: [
     FormsModule,
-    CommonModule
+    CommonModule,
+    CountdownModule
   ],
   styleUrls: [ './session-detail.component.scss' ]
 })
 export class SessionDetailComponent implements OnInit {
+  @ViewChild('countdown') countdown: CountdownComponent | undefined;
+
   userSessionId = '';
   allUserBySession: any[] = [];
   question: any;
   selectedAnswer: any;
+  sessionDetail: any;
+  userDetail: any;
   success = false;
+  countdownConfig: any;
+  userId: any;
 
   constructor(private router: Router,
               private toastr: ToastrService,
@@ -30,6 +38,7 @@ export class SessionDetailComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.userId = sessionStorage.getItem('userId');
     this.userSessionId = sessionStorage.getItem('userSessionId') as string;
     this.listenStateChanged();
     this.getQuestionOfSession();
@@ -37,6 +46,10 @@ export class SessionDetailComponent implements OnInit {
 
   selectAnswer(a: any) {
     this.selectedAnswer = a;
+  }
+
+  navigateBack() {
+    this.router.navigate([ '/' ]);
   }
 
   listenStateChanged() {
@@ -69,6 +82,7 @@ export class SessionDetailComponent implements OnInit {
     }
     this.websocketService.sendMessage('Hello, Group!');
     this.quizService.answerTheQuestion(body).subscribe((res: any) => {
+      this.selectedAnswer = '';
       this.toastr.success('Quiz answer successfully', 'Success');
       this.getQuestionOfSession();
     })
@@ -85,9 +99,29 @@ export class SessionDetailComponent implements OnInit {
       }
       this.question = res?.question;
       this.allUserBySession = res?.allUserBySession;
+      this.sessionDetail = res?.sessionDetail;
+      this.userDetail = res?.userDetail;
       this.computeSessionList();
+      this.countdownConfig = {
+        leftTime: this.sessionDetail.timeLeft,
+        format: 'mm:ss',
+        demand: false
+      };
+      setTimeout(() => {
+        if (this.countdown) {
+          this.countdown.begin();
+        }
+      });
     }, err => {
       this.toastr.error(err?.error?.message, 'Error');
     })
+  }
+
+  onTimerFinished($event: any) {
+    if (this.countdownConfig) {
+      if ($event.action == 'done') {
+        this.getQuestionOfSession();
+      }
+    }
   }
 }

@@ -1,5 +1,9 @@
-Join room
-<div class="room-creation-container">
-  <input [(ngModel)]="roomName">
-  <button (click)="joinSession()" [disabled]="!roomName">Join me!</button>
-</div>
+<p>Join room</p>
+<form class="room-creation-container">
+  <input [(ngModel)]="roomName"  [ngModelOptions]="{standalone: true}">
+
+  <div class="action-button">
+    <button class="outline-btn" (click)="goBackToHome()">Back</button>
+    <button (click)="joinSession()" [disabled]="!roomName">Join me!</button>
+  </div>
+</form>

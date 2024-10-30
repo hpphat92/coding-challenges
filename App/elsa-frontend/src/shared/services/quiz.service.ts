@@ -21,6 +21,11 @@ export class QuizService {
     return this.http.post(`${ environment.quizService }/quiz/current-questions`, requestBody)
   }
 
+
+  getSessionByUserId(userId: any) {
+    return this.http.get(`${ environment.quizService }/quiz/user/${userId}`)
+  }
+
   answerTheQuestion(requestBody: any) {
     return this.http.put(`${ environment.quizService }/quiz/answer-question`, requestBody)
   }

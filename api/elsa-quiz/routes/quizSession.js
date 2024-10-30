@@ -6,17 +6,22 @@ var router = express.Router();
 const socketIO = require('../socket');
 const {ObjectId} = require('mongodb');
 
-// Get session detail
-router.get('/:sessionId', async (req, res) => {
-    const sessionId = req.params.sessionId;
-});
-
 // New Session
 router.post('/', async (req, res) => {
     try {
         const {
             sessionName, createdBy
         } = req.body;
+
+        const existingSession = await db.model.QuizSession.findOne({
+            sessionName: {
+                $regex: new RegExp(sessionName, 'i')
+            }
+        });
+
+        if (existingSession) {
+            return res.status(400).json({message: 'Session already exists'});
+        }
 
         const questionList = await db.model.Questions.aggregate([{$sample: {size: 5}}, {$project: {_id: 1}}]);
 
@@ -35,7 +40,7 @@ router.post('/', async (req, res) => {
     }
 });
 
-// New Session
+// Join session
 router.post('/join', async (req, res) => {
     const io = socketIO.getIO();
     try {
@@ -69,12 +74,34 @@ router.post('/join', async (req, res) => {
         const userSession = await userSessionDB.save();
         const user = await db.model.Players.findById(userId);
         io.emit('joinRoom', {
-            user,
-            userSession: userSession._id
+            user, userSession: userSession._id
         });
         res.status(200).json(userSession._id);
     } catch (err) {
         res.status(500).json({message: 'Error creating user quiz session', error: err.message});
+    }
+});
+
+// Get All session of a user
+router.get('/user/:userId', async (req, res) => {
+    try {
+        const userId = req.params.userId;
+
+        const allSessionsByUserId = await db.model.QuizSession.aggregate([
+            {
+                $match: {createdBy: userId} // Match documents with the specified userId
+            },
+            {
+                $project: {
+                    _id: 1,
+                    sessionName: 1
+                }
+            }
+        ])
+
+        res.status(200).json(allSessionsByUserId);
+    } catch (err) {
+        res.status(500).json({message: 'Error creating session', error: err.message});
     }
 });
 
@@ -91,6 +118,9 @@ router.post('/current-questions', async (req, res) => {
         if (!existingUserSession || existingUserSession.userId !== userId) {
             return res.status(400).json({message: 'Session not found'});
         }
+
+        const session = await db.model.QuizSession.findById(existingUserSession.sessionId);
+        const user = await db.model.Players.findById(existingUserSession.userId);
 
         if (existingUserSession.currentQuestionTimeRequested) {
             if (Math.abs(existingUserSession.currentQuestionTimeRequested - +Date.now()) >= 1000 * existingUserSession.timeForEachAnswer) {
@@ -121,47 +151,44 @@ router.post('/current-questions', async (req, res) => {
             }
         }
 
-        const allUserBySession = await db.model.PlayerQuizSession.aggregate([
-            {
-                $match: {sessionId: existingUserSession.sessionId} // Equivalent to find() query
-            },
-            {
-                $lookup: {
-                    from: "players",            // Collection to join
-                    let: {userId: "$userId"}, // Pass the userId from PlayerQuizSession
-                    pipeline: [
-                        {
-                            $match: {
-                                $expr: {
-                                    $eq: ["$_id", {$toObjectId: "$$userId"}] // Compare ObjectId with converted userId
-                                }
-                            }
+        const allUserBySession = await db.model.PlayerQuizSession.aggregate([{
+            $match: {sessionId: existingUserSession.sessionId} // Equivalent to find() query
+        }, {
+            $lookup: {
+                from: "players",            // Collection to join
+                let: {userId: "$userId"}, // Pass the userId from PlayerQuizSession
+                pipeline: [{
+                    $match: {
+                        $expr: {
+                            $eq: ["$_id", {$toObjectId: "$$userId"}] // Compare ObjectId with converted userId
                         }
-                    ],
-                    as: "userDetails"           // Alias for the joined data
-                }
-            },
-            {
-                $unwind: {
-                    path: "$userDetails",      // Deconstructs the array to get a single user object
-                    preserveNullAndEmptyArrays: true // Optional: preserves documents if no match found
-                }
-            },
-            {
-                $project: {
-                    score: 1,
-                    "userDetails.name": 1,      // Include user name from joined data
-                    "userDetails._id": 1,      // Include user name from joined data
-                    "userDetails.displayName": 1 // Include display name from joined data
-                }
+                    }
+                }], as: "userDetails"           // Alias for the joined data
             }
-        ]);
+        }, {
+            $unwind: {
+                path: "$userDetails",      // Deconstructs the array to get a single user object
+                preserveNullAndEmptyArrays: true // Optional: preserves documents if no match found
+            }
+        }, {
+            $project: {
+                score: 1, "userDetails.name": 1,      // Include user name from joined data
+                "userDetails._id": 1,      // Include user name from joined data
+                "userDetails.displayName": 1 // Include display name from joined data
+            }
+        }]);
 
         res.status(200).json({
-            question,
-            allUserBySession,
-            userDetail: {
+            question, allUserBySession, userDetail: {
                 score: existingUserSession.score,
+                name: user?.name
+            },
+            sessionDetail: {
+                sessionName: session.sessionName,
+                timeForEachAnswer: session.timeForEachAnswer,
+                timeLeft: question ? session.timeForEachAnswer - (Date.now() - existingUserSession.currentQuestionTimeRequested) / 1000 : -1,
+                questionIdx: existingUserSession.currentQuestionIdx,
+                totalQuestion: existingUserSession.questionList.length
             }
         });
     } catch (err) {

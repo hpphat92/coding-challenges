@@ -1,29 +1,46 @@
-<ng-container *ngIf="!success">
-  <div class="question-container">
-    <div class="question">
-      {{ question?.question }}
-    </div>
-    <div class="answer-container">
-      <div class="answer" *ngFor="let a of question?.answers" (click)="selectAnswer(a)"
-           [class.selected]="selectedAnswer === a">
-        {{ a }}
+<div class="session-detail">
+  <span>Hello <b>{{userDetail?.name}}</b>! You are in game room named <b>{{sessionDetail?.sessionName}}</b> and got <b>{{userDetail?.score}} point(s)</b>
+  Invite other people by tell them that name to join for fun!!
+  </span>
+  <button (click)="navigateBack()">Back</button>
+</div>
+<div class="content" [class.success]="success">
+  <ng-container *ngIf="!success">
+    <div class="question-container">
+      <div class="question">
+        Question {{sessionDetail.questionIdx+1}}/{{sessionDetail.totalQuestion}}: {{ question?.question }}
+      </div>
+      <div class="answer-container">
+        <div class="answer" *ngFor="let a of question?.answers" (click)="selectAnswer(a)"
+             [class.selected]="selectedAnswer === a">
+          {{ a }}
+        </div>
+      </div>
+
+      <div class="submit-button">
+        <button (click)="submitAnswer()" [disabled]="!selectedAnswer">Submit</button>
+        <div class="countdown" *ngIf="countdownConfig">
+          Remember to answer the question in
+          <countdown #cd [config]="countdownConfig" (event)="onTimerFinished($event)" /> seconds
+        </div>
       </div>
     </div>
-
-    <button *ngIf="selectedAnswer" (click)="submitAnswer()">Submit</button>
-  </div>
-</ng-container>
-<ng-container *ngIf="success">
-  Congratulation!, You have finished the game.
-</ng-container>
-
-<div class="leader-board">
-  Leaderboard
-
-  <ng-container *ngFor="let user of allUserBySession">
-    <div class="user-detail">
-      <div class="name">{{ user.userDetails.displayName }}</div>
-      <div class="score">{{ user.score }}</div>
+  </ng-container>
+  <ng-container *ngIf="success">
+    <div class="congratulation-text">
+      <p>Congratulation {{userDetail?.name}}! You have finished the game.</p>
+      <a class="back-to-game" href="/home">Back to home</a>
     </div>
   </ng-container>
+
+  <div class="leader-board">
+    <div class="title">Leaderboard</div>
+
+    <ng-container *ngFor="let user of allUserBySession">
+      <div class="user-detail" [class.yourself]="user.userDetails._id === userId">
+        <div class="name">{{ user.userDetails.displayName }}</div>
+        <div class="score">{{ user.score }}</div>
+      </div>
+    </ng-container>
+  </div>
 </div>

@@ -1,0 +1,53 @@
+:host {
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 200px;
+
+  }
+
+  p {
+    font-size: 18px;
+    font-weight: bold;
+  }
+
+  input {
+    font-size: 14px;
+    padding: 8px;
+    color: #888;
+  }
+
+  button {
+    height: 40px;
+    font-size: 16px;
+    background-color: rgba(1, 9, 197);
+    color: #eee;
+
+    &:not(:disabled) {
+      cursor: pointer;
+    }
+
+    &:disabled {
+      color: #aaa;
+      background-color: #2e1313;
+    }
+  }
+
+  .signup {
+    display: flex;
+    gap: 4px;
+  }
+
+
+  .action-button {
+    display: flex;
+    gap: 12px;
+
+    .outline-btn {
+      background-color: transparent;
+      color: #000;
+      border: none;
+    }
+  }
+}

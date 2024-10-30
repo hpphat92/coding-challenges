@@ -1,4 +1,9 @@
-App login
-<a href="/signup">Signup</a>
-<input placeholder="User name (casesenstive)" [(ngModel)]="username"/>
-<button (click)="login()" [disabled]="!username">Login</button>
+<p>Login to the system</p>
+
+<form>
+  <input placeholder="User name" [(ngModel)]="username"  [ngModelOptions]="{standalone: true}"/>
+  <button (click)="login()" [disabled]="!username">Login</button>
+  <div class="signup">
+    Did not have account? <a href="/signup">Signup</a>
+  </div>
+</form>

@@ -7,7 +7,6 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var db = require('./database');
 
-var questionsRouter = require('./routes/questions');
 var quizSessionRouter = require('./routes/quizSession');
 const {Server} = require("socket.io");
 const {init, socket} = require("./socket");
@@ -22,7 +21,6 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors());
 
-app.use('/questions', questionsRouter);
 app.use('/quiz', quizSessionRouter);
 
 // catch 404 and forward to error handler

@@ -21,6 +21,10 @@ export class JoinRoomComponent {
               private quizService: QuizService) {
   }
 
+  goBackToHome(){
+    this.router.navigate(['/']);
+  }
+
   joinSession() {
     this.quizService.joinQuiz({
       sessionName: this.roomName,

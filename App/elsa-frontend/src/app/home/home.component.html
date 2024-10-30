@@ -1,9 +1,47 @@
-Hello {{ username }}
-<div class="action-container">
-  <a href="/rooms">Join room</a>
+<div class="welcome-container">
+  <span>Hello <strong>{{ username }}</strong></span>
   <a href="javascript:void(0)" (click)="logout()">Logout</a>
 </div>
-<div class="room-creation-container">
-  <input [(ngModel)]="sessionName">
-  <button (click)="createNewSession()" [disabled]="!sessionName">Create New Game</button>
+<div class="user-selection" *ngIf="!currentSelectedType">
+  <div class="join-existing-room" (click)="setSelectedType('existing')">
+    Join Existing Room
+  </div>
+  <div class="join-existing-room" (click)="setSelectedType('new')">
+    Create New Room
+  </div>
 </div>
+
+<ng-container *ngIf="currentSelectedType === 'new'">
+  <div class="room-creation-container">
+    <p>Enter some friendly name you like!</p>
+    <input [(ngModel)]="sessionName">
+    <div class="action-button">
+      <button class="outline-btn" (click)="setSelectedType(null)">Back</button>
+      <button (click)="createNewSession()" [disabled]="!sessionName">Create New Game</button>
+    </div>
+  </div>
+</ng-container>
+
+<ng-container *ngIf="sessionList?.length">
+  <div class="my-session">
+    <p>Your Session</p>
+    <div class="session-list">
+      <div class="session-name" *ngFor="let session of sessionList">
+        <div class="name">
+          {{ session.sessionName }}
+        </div>
+        <button (click)="joinSession(session.sessionName)">Join</button>
+      </div>
+    </div>
+  </div>
+</ng-container>
+
+
+<!--<div class="action-container">-->
+<!--  <a href="/rooms">Join room</a>-->
+<!--  <a href="javascript:void(0)" (click)="logout()">Logout</a>-->
+<!--</div>-->
+<!--<div class="room-creation-container">-->
+<!--  <input [(ngModel)]="sessionName">-->
+<!--  <button (click)="createNewSession()" [disabled]="!sessionName">Create New Game</button>-->
+<!--</div>-->

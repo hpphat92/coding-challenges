@@ -44,7 +44,7 @@ const playersSchema = new mongoose.Schema({
 module.exports = {
     model: {
         Questions: mongoose.model('questions', questionSchema),
-        QuizSession: mongoose.model('quiz_session', quizSessionSchema),
+        QuizSession: mongoose.model('quiz_sessions', quizSessionSchema),
         PlayerQuizSession: mongoose.model('player_quiz_session', playerQuizSessionSchema),
         Players: mongoose.model('players', playersSchema)
     }
