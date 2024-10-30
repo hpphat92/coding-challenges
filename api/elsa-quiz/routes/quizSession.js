@@ -74,7 +74,8 @@ router.post('/join', async (req, res) => {
         const userSession = await userSessionDB.save();
         const user = await db.model.Players.findById(userId);
         io.emit('joinRoom', {
-            user, userSession: userSession._id
+            user,
+            sessionId: session._id
         });
         res.status(200).json(userSession._id);
     } catch (err) {
@@ -106,7 +107,7 @@ router.get('/user/:userId', async (req, res) => {
 });
 
 // Get current question
-router.post('/current-questions', async (req, res) => {
+router.post('/current-question', async (req, res) => {
     try {
         const {
             userSessionId, userId
@@ -184,6 +185,7 @@ router.post('/current-questions', async (req, res) => {
                 name: user?.name
             },
             sessionDetail: {
+                sessionId: session._id,
                 sessionName: session.sessionName,
                 timeForEachAnswer: session.timeForEachAnswer,
                 timeLeft: question ? session.timeForEachAnswer - (Date.now() - existingUserSession.currentQuestionTimeRequested) / 1000 : -1,

@@ -61,6 +61,9 @@ export class SessionDetailComponent implements OnInit {
       this.computeSessionList();
     });
     this.websocketService.listenForMessage('joinRoom', (res: any) => {
+      if (this.sessionDetail.sessionId !== res.sessionId) {
+        return;
+      }
       this.allUserBySession.push({
         userDetails: res.user,
         score: 0

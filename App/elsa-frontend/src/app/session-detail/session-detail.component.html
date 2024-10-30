@@ -8,7 +8,7 @@
   <ng-container *ngIf="!success">
     <div class="question-container">
       <div class="question">
-        Question {{sessionDetail.questionIdx+1}}/{{sessionDetail.totalQuestion}}: {{ question?.question }}
+        Question {{sessionDetail?.questionIdx+1}}/{{sessionDetail?.totalQuestion}}: {{ question?.question }}
       </div>
       <div class="answer-container">
         <div class="answer" *ngFor="let a of question?.answers" (click)="selectAnswer(a)"
