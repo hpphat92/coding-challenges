@@ -1,0 +1,9 @@
+Hello {{ username }}
+<div class="action-container">
+  <a href="/rooms">Join room</a>
+  <a href="javascript:void(0)" (click)="logout()">Logout</a>
+</div>
+<div class="room-creation-container">
+  <input [(ngModel)]="sessionName">
+  <button (click)="createNewSession()" [disabled]="!sessionName">Create New Game</button>
+</div>

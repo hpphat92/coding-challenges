@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { UserServices } from "../shared/services/user.services";
+import { UserService } from "../shared/services/user.service";
 import { ToastrService } from "ngx-toastr";
 import { FormsModule } from "@angular/forms";
 
@@ -14,7 +14,7 @@ import { FormsModule } from "@angular/forms";
 export class AppComponent {
   newUserName = '';
 
-  constructor(private userServices: UserServices,
+  constructor(private userServices: UserService,
               private toastr: ToastrService) {
   }
 

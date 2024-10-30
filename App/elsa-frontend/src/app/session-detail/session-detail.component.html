@@ -1,0 +1,16 @@
+<ng-container *ngIf="!success">
+  <div class="question">
+    {{ question?.question }}
+  </div>
+  <div class="answer-container">
+    <div class="answer" *ngFor="let a of question?.answers" (click)="selectAnswer(a)"
+         [class.selected]="selectedAnswer === a">
+      {{ a }}
+    </div>
+  </div>
+
+  <button *ngIf="selectedAnswer" (click)="submitAnswer()">Submit</button>
+</ng-container>
+<ng-container *ngIf="success">
+  Congratulation!, You have finished the game.
+</ng-container>

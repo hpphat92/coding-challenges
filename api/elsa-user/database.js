@@ -21,6 +21,6 @@ const playersSchema = new mongoose.Schema({
 
 module.exports = {
     model: {
-        Players: mongoose.model('Players', playersSchema)
+        Players: mongoose.model('players', playersSchema)
     }
 };

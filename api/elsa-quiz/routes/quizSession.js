@@ -1,9 +1,168 @@
 var express = require('express');
+var lodash = require('lodash');
 const db = require("../database");
+const {TIME_FOR_EACH_ANSWER_IN_SECONDS} = require("../config");
 var router = express.Router();
 
+// Get session detail
 router.get('/:sessionId', async (req, res) => {
-    const questionId = req.params.sessionId;
+    const sessionId = req.params.sessionId;
+});
+
+// New Session
+router.post('/', async (req, res) => {
+    try {
+        const {
+            sessionName, createdBy
+        } = req.body;
+
+        const questionList = await db.model.Questions.aggregate([{$sample: {size: 5}}, {$project: {_id: 1}}]);
+
+        const questionListId = questionList.map((question) => question._id);
+        const newSession = new db.model.QuizSession({
+            sessionName,
+            questionList: questionListId,
+            timeForEachAnswer: TIME_FOR_EACH_ANSWER_IN_SECONDS,
+            createdBy,
+            sessionExpiredAt: +Date.now() + 1000 * (TIME_FOR_EACH_ANSWER_IN_SECONDS * questionList.length)
+        });
+        const savedSession = await newSession.save();
+        res.status(200).json(savedSession._id);
+    } catch (err) {
+        res.status(500).json({message: 'Error creating session', error: err.message});
+    }
+});
+
+// New Session
+router.post('/join', async (req, res) => {
+    try {
+        const {
+            sessionName, userId
+        } = req.body;
+
+        const session = await db.model.QuizSession.findOne({
+            sessionName: {
+                $regex: new RegExp(sessionName, 'i')
+            }
+        });
+
+        if (!session) {
+            return res.status(400).json({message: 'Session not found'});
+        }
+
+        const existingUserSession = await db.model.PlayerQuizSession.find({
+            sessionId: session._id, userId,
+        });
+
+        if (existingUserSession?.length) {
+            return res.status(200).json(existingUserSession[0]._id);
+        }
+
+        const questionListId = lodash.shuffle(session.questionList);
+
+        const userSessionDB = new db.model.PlayerQuizSession({
+            sessionId: session._id, userId, questionList: questionListId, timeForEachAnswer: session.timeForEachAnswer
+        });
+        const userSession = await userSessionDB.save();
+        res.status(200).json(userSession._id);
+    } catch (err) {
+        res.status(500).json({message: 'Error creating user quiz session', error: err.message});
+    }
+});
+
+// Get current question
+router.post('/current-question', async (req, res) => {
+    try {
+        const {
+            userSessionId, userId
+        } = req.body;
+
+        const existingUserSession = await db.model.PlayerQuizSession.findById(userSessionId);
+
+        if (!existingUserSession) {
+            return res.status(400).json({message: 'Session not found'});
+        }
+
+        if (existingUserSession.currentQuestionTimeRequested) {
+            if (Math.abs(existingUserSession.currentQuestionTimeRequested - +Date.now()) >= 1000 * existingUserSession.timeForEachAnswer) {
+                existingUserSession.currentQuestionIdx++;
+                existingUserSession.currentQuestionTimeRequested = +Date.now();
+                existingUserSession.save();
+            }
+        } else {
+            existingUserSession.currentQuestionTimeRequested = +Date.now();
+            existingUserSession.save();
+        }
+
+
+        const currentQuestion = existingUserSession.questionList[existingUserSession.currentQuestionIdx];
+
+        if (!currentQuestion) {
+            return res.status(203).json({message: 'Game Successfully done'});
+        }
+
+        const question = await db.model.Questions.findById(currentQuestion).select({
+            question: 1, answers: 1
+        });
+
+        if (!question) {
+            return res.status(400).json({message: 'Question not found'});
+        }
+
+        res.status(200).json(question);
+    } catch (err) {
+        res.status(500).json({message: 'Error getting current question', error: err.message});
+    }
+});
+
+// Answer the question
+router.put('/answer-question', async (req, res) => {
+    try {
+        const {
+            userSessionId, userId, answer, questionId
+        } = req.body;
+
+
+        const userSession = await db.model.PlayerQuizSession.findById(userSessionId);
+
+        if (!userSession) {
+            return res.status(400).json({message: 'Session not found'});
+        }
+
+        const currrentQuestionId = userSession.questionList[userSession.currentQuestionIdx];
+        if (questionId !== currrentQuestionId) {
+            return res.status(400).json({message: 'Question already answered or time is up for this question'});
+        }
+
+        let timeRequiredToAnswer = 0;
+
+        if (userSession.currentQuestionTimeRequested) {
+            timeRequiredToAnswer = Math.abs(userSession.currentQuestionTimeRequested - +Date.now()) / 1000;
+            if (timeRequiredToAnswer >= userSession.timeForEachAnswer) {
+                return res.status(400).json({message: 'Question already answered or time is up for this question'});
+            }
+        }
+
+        const question = await db.model.Questions.findById(questionId);
+
+        if (!question) {
+            return res.status(400).json({message: 'Question not found'});
+        }
+
+        if (question.correctAnswer.toLowerCase() === answer.toLowerCase()) {
+            const score = Math.ceil((1 - timeRequiredToAnswer / (userSession.timeForEachAnswer || Number.MAX_SAFE_INTEGER)) * 100);
+
+            userSession.score += score;
+        }
+
+        userSession.currentQuestionIdx++;
+        userSession.currentQuestionTimeRequested = 0;
+        await userSession.save();
+
+        res.status(201).json();
+    } catch (err) {
+        res.status(500).json({message: 'Error getting current question', error: err.message});
+    }
 });
 
 module.exports = router;
